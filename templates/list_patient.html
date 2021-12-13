@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Disease Management System</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+			crossorigin="anonymous">
+	</head>
+	<body>
+		<div class="container card p-3 mt-3 border-primary" style="opacity: 0.90;">
+			
+		<h3 class="text-center"> List of Patients</h3>
+        <div class="row">
+            <div class ="col-lg-2">
+                <a href="/add_patient" class="btn btn-primary mt-1 mb-1">Add New Patient</a>
+            </div>
+        </div>
+		
+			<table class="table table-striped mt-1 text-center table-bordered">
+				<thead class="table-dark" style="background-color:RebeccaPurple">
+					<tr>
+						<th> Patient Id</th>
+						<th> First Name</th>
+						<th> Last Name</th>
+						<th> Date of Birth</th>
+                        <th> Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+                    {% for row in result %}
+					<tr>
+						<td>{{ row["patient_id"] }}</td>
+						<td>{{ row["first_name"] }}</td>
+						<td>{{ row["last_name"] }}</td>
+						<td>{{ row["date_of_birth"] }}</td>
+						
+                        <td>
+							<a href="update_patient/{{row['patient_id']}}" class="btn btn-primary" method="GET" style="background-color:DarkOrange;">Update</a>
+							<a href="delete_patient/{{row['patient_id']}}" class="btn btn-primary" method="DELETE"style="background-color:Red;">Delete</a>
+                        </td>
+							
+					</tr>
+                    {% endfor %}
+					
+				</tbody>
+			</table>
+            <div>
+                <h3><a href = "/">Click here to return on home page</a></h3>
+            </div>
+		</div>
+	</body>
+	
+
+
+</html>
