@@ -2,9 +2,12 @@ from flask import Flask, render_template,request,jsonify
 from flask.helpers import url_for
 from flask.wrappers import Response
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql.elements import BindParameter
+from sqlalchemy.sql.sqltypes import Integer
 from werkzeug.utils import redirect
 
 from models import Patient,Medication,Measurement,Allergy
+from sqlalchemy import text 
 from get_db import db,app
 
 @app.route('/')
@@ -18,12 +21,26 @@ def get_patients():
     result=[Patient.json(patient) for patient in Patient.query.all()]
     return jsonify({"Patients":result})
 
+@app.route('/patients_sql',methods=['GET'])
+def get_patients_sql():
+    query=text('SELECT * FROM patient')
+    data=db.session.execute(query)
+    result=[Patient.json(patient) for patient in data]
+    return jsonify({"Patients":result})
+#------------------------------------------------------------------------------#
 
 @app.route('/patients/<int:patient_id>',methods=['GET'])
 def get_patient_by_id(patient_id):
     patient=Patient.json(Patient.query.filter_by(patient_id=patient_id).first())
     return jsonify({"Patients":patient})
 
+@app.route('/patients_sql/<int:patient_id>',methods=['GET'])
+def get_patients_sql_by_id(patient_id):
+    query=text('SELECT * FROM patient where patient_id = :id')
+    data=db.session.execute(query,{"id":patient_id})
+    result=[Patient.json(patient) for patient in data]
+    return jsonify({"Patients":result})
+#------------------------------------------------------------------------------#
 
 @app.route('/patients',methods=['POST'])
 def add_patient():
@@ -34,6 +51,16 @@ def add_patient():
     response={"Msg":"Patient added"}
     return response
 
+@app.route('/patients_sql',methods=['POST'])
+def add_patient_sql():
+    request_data=request.get_json()
+    query=text('INSERT INTO patient(first_name,last_name,date_of_birth) VALUES(:fname,:lname,:dob)')
+    db.session.execute(query,{"fname":request_data['first_name'],"lname":request_data['last_name'],"dob":request_data['date_of_birth']})
+    db.session.commit() 
+    response={"Msg":"Patient added"}
+    return response
+
+#-------------------------------------------------------------------------------------#
 
 @app.route('/patients/<int:patient_id>',methods=['PUT'])
 def update_patient(patient_id):
@@ -46,13 +73,29 @@ def update_patient(patient_id):
     db.session.commit()
     return jsonify({"Msg":"Patient updated"})
 
+@app.route('/patients_sql/<int:patient_id>',methods=['PUT'])
+def update_patient_sql(patient_id):
+    updated_data=request.get_json()
+    val={"fname":updated_data['first_name'],"lname":updated_data['last_name'],
+        "dob":updated_data['date_of_birth'],"id":patient_id}
+    query=text('UPDATE patient SET first_name=:fname,last_name=:lname,date_of_birth=:dob WHERE patient_id=:id')
+    db.session.execute(query,val)
+    db.session.commit()
+    return jsonify({"Msg":"Patient updated"})
 
+#-----------------------------------------------------------------------------------#
 @app.route('/patients/<int:patient_id>',methods=['DELETE'])
 def delete_patient(patient_id):
     Patient.query.filter_by(patient_id=patient_id).delete()
     db.session.commit()
     return jsonify({"Msg":"Patient deleted"})
 
+@app.route('/patients_sql/<int:patient_id>',methods=['DELETE'])
+def delete_patient_sql(patient_id):
+    query=text('DELETE FROM patient WHERE patient_id=:id')
+    db.session.execute(query,{"id":patient_id})
+    db.session.commit()
+    return jsonify({"Msg":"Patient deleted"})
 
 ############################## Medication API ###########################
 
@@ -61,13 +104,27 @@ def medications():
     result=[Medication.json(med) for med in Medication.query.all()]
     return jsonify({"Medications":result})
 
+@app.route('/medications_sql',methods=['GET'])
+def medications_sql():
+    query=text('SELECT * FROM medication')
+    data=db.session.execute(query)
+    result=[Medication.json(med) for med in data]
+    return jsonify({"Medications":result})
+#----------------------------------------------------------------------#
 
 @app.route('/medications/<int:med_id>',methods=['GET'])
 def get_medication_by_id(med_id):
     medication=Medication.json(Medication.query.filter_by(med_id=med_id).first())
     return jsonify({"Medications":medication})
 
+@app.route('/medications_sql/<int:med_id>',methods=['GET'])
+def get_medication_sql_by_id(med_id):
+    query=text('SELECT * FROM medication where med_id = :id')
+    data=db.session.execute(query,{"id":med_id})
+    result=[Medication.json(patient) for patient in data]
+    return jsonify({"Medications":result})
 
+#-----------------------------------------------------------------------#
 @app.route('/medications',methods=['POST'])
 def add_medication():
     request_data=request.get_json()
