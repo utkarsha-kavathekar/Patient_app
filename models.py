@@ -1,4 +1,3 @@
-from re import M
 from get_db import db
 
 class Patient(db.Model):

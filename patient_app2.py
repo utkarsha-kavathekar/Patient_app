@@ -18,10 +18,12 @@ def get_patients():
     result=[Patient.json(patient) for patient in Patient.query.all()]
     return jsonify({"Patients":result})
 
+
 @app.route('/patients/<int:patient_id>',methods=['GET'])
 def get_patient_by_id(patient_id):
     patient=Patient.json(Patient.query.filter_by(patient_id=patient_id).first())
     return jsonify({"Patients":patient})
+
 
 @app.route('/patients',methods=['POST'])
 def add_patient():
@@ -31,6 +33,7 @@ def add_patient():
     db.session.commit() 
     response={"Msg":"Patient added"}
     return response
+
 
 @app.route('/patients/<int:patient_id>',methods=['PUT'])
 def update_patient(patient_id):
@@ -43,22 +46,27 @@ def update_patient(patient_id):
     db.session.commit()
     return jsonify({"Msg":"Patient updated"})
 
+
 @app.route('/patients/<int:patient_id>',methods=['DELETE'])
 def delete_patient(patient_id):
     Patient.query.filter_by(patient_id=patient_id).delete()
     db.session.commit()
     return jsonify({"Msg":"Patient deleted"})
 
+
 ############################## Medication API ###########################
+
 @app.route('/medications',methods=['GET'])
 def medications():
     result=[Medication.json(med) for med in Medication.query.all()]
     return jsonify({"Medications":result})
 
+
 @app.route('/medications/<int:med_id>',methods=['GET'])
 def get_medication_by_id(med_id):
     medication=Medication.json(Medication.query.filter_by(med_id=med_id).first())
     return jsonify({"Medications":medication})
+
 
 @app.route('/medications',methods=['POST'])
 def add_medication():
@@ -68,6 +76,7 @@ def add_medication():
     db.session.commit() 
     response={"Msg":"Medication added"}
     return response
+
 
 @app.route('/medications/<int:med_id>',methods=['PUT'])
 def update_medication(med_id):
@@ -81,22 +90,28 @@ def update_medication(med_id):
     db.session.commit()
     return jsonify({"Msg":"Medication updated"})
 
+
 @app.route('/medications/<int:med_id>',methods=['DELETE'])
 def delete_medication(med_id):
     Medication.query.filter_by(med_id=med_id).delete()
     db.session.commit()
     return jsonify({"Msg":"Medication deleted"})
 
+
 ################################ Measurement API ################################
+
+
 @app.route('/measurements',methods=['GET'])
 def measurements():
     result=[Measurement.json(mes) for mes in Measurement.query.all()]
     return jsonify({"Measurements":result})
 
+
 @app.route('/measurements/<int:measure_id>',methods=['GET'])
 def get_measurement_by_id(measure_id):
     measurement=Measurement.json(Measurement.query.filter_by(measure_id=measure_id).first())
     return jsonify({"Measurements":measurement})
+
 
 @app.route('/measurements',methods=['POST'])
 def add_measurement():
@@ -106,6 +121,7 @@ def add_measurement():
     db.session.commit() 
     response={"Msg":"Measurement added"}
     return response
+
 
 @app.route('/measurements/<int:measure_id>',methods=['PUT'])
 def update_measurement(measure_id):
@@ -117,6 +133,7 @@ def update_measurement(measure_id):
     mes.patient_id = updated_data['patient_id']
     db.session.commit()
     return jsonify({"Msg":"Measurement updated"})
+
 
 @app.route('/measurements/<int:measure_id>',methods=['DELETE'])
 def delete_measurement(measure_id):
