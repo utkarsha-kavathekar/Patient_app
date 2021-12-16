@@ -134,7 +134,20 @@ def add_medication():
     response={"Msg":"Medication added"}
     return response
 
-
+@app.route('/medications_sql',methods=['POST'])
+def add_medication_sql():
+    request_data=request.get_json()
+    query=text('INSERT INTO medication(med_name,dose,frequency,intake_type,patient_id) VALUES(:mname,:dose,:frq,:intake,:pid)')
+    val={"mname":request_data['med_name'],
+        "dose":request_data['dose'],
+        "frq":request_data['frequency'],
+        "intake":request_data['intake_type'],
+        "pid":request_data['patient_id']}
+    db.session.execute(query,val)
+    db.session.commit() 
+    response={"Msg":"Medication added"}
+    return response
+#-----------------------------------------------------------------------#
 @app.route('/medications/<int:med_id>',methods=['PUT'])
 def update_medication(med_id):
     updated_data=request.get_json()
@@ -147,14 +160,28 @@ def update_medication(med_id):
     db.session.commit()
     return jsonify({"Msg":"Medication updated"})
 
-
+@app.route('/medications_sql/<int:med_id>',methods=['PUT'])
+def update_medication_sql(med_id):
+    updated_data=request.get_json()
+    val={"mname":updated_data['med_name'],"dose":updated_data['dose'],
+        "frq":updated_data['frequency'],"pid":updated_data['patient_id'],"mid":med_id}
+    query=text('UPDATE medication SET med_name=:mname,dose=:dose,frequency=:frq,patient_id=:pid WHERE med_id=:mid')
+    db.session.execute(query,val)
+    db.session.commit()
+    return jsonify({"Msg":"Medication updated"})
+#-------------------------------------------------------------------------------------------#
 @app.route('/medications/<int:med_id>',methods=['DELETE'])
 def delete_medication(med_id):
     Medication.query.filter_by(med_id=med_id).delete()
     db.session.commit()
     return jsonify({"Msg":"Medication deleted"})
 
-
+@app.route('/medications_sql/<int:med_id>',methods=['DELETE'])
+def delete_medication_sql(med_id):
+    query=text('DELETE FROM medication WHERE med_id=:id')
+    db.session.execute(query,{"id":med_id})
+    db.session.commit()
+    return jsonify({"Msg":"Medication deleted"})
 ################################ Measurement API ################################
 
 
@@ -163,13 +190,28 @@ def measurements():
     result=[Measurement.json(mes) for mes in Measurement.query.all()]
     return jsonify({"Measurements":result})
 
+@app.route('/measurements_sql',methods=['GET'])
+def measurements_sql():
+    query=text('SELECT * FROM measurements')
+    data=db.session.execute(query)
+    result=[Measurement.json(mes) for mes in data]
+    return jsonify({"Measurements":result})
+
+#------------------------------------------------------------------------------------#
 
 @app.route('/measurements/<int:measure_id>',methods=['GET'])
 def get_measurement_by_id(measure_id):
     measurement=Measurement.json(Measurement.query.filter_by(measure_id=measure_id).first())
     return jsonify({"Measurements":measurement})
 
+@app.route('/measurements_sql/<int:measure_id>',methods=['GET'])
+def get_measurement_sql_by_id(measure_id):
+    query=text('SELECT * FROM measurement where measure_id = :id')
+    data=db.session.execute(query,{"id":measure_id})
+    result=[Measurement.json(patient) for patient in data]
+    return jsonify({"Measurements":result})
 
+#-----------------------------------------------------------------------------#
 @app.route('/measurements',methods=['POST'])
 def add_measurement():
     request_data=request.get_json()
@@ -179,7 +221,16 @@ def add_measurement():
     response={"Msg":"Measurement added"}
     return response
 
+@app.route('/measurements_sql',methods=['POST'])
+def add_measurement_sql():
+    request_data=request.get_json()
+    query=text('INSERT INTO measurement(measure_name,unit,value,patient_id) VALUES(:mname,:unit,:value,:pid)')
+    db.session.execute(query,{"mname":request_data['measure_name'],"unit":request_data['unit'],"value":request_data['value'],"pid":request_data['patient_id']})
+    db.session.commit() 
+    response={"Msg":"Measurement added"}
+    return response
 
+#-----------------------------------------------------------------------------#
 @app.route('/measurements/<int:measure_id>',methods=['PUT'])
 def update_measurement(measure_id):
     updated_data=request.get_json()
@@ -191,10 +242,31 @@ def update_measurement(measure_id):
     db.session.commit()
     return jsonify({"Msg":"Measurement updated"})
 
+@app.route('/measurements_sql/<int:measure_id>',methods=['PUT'])
+def update_measurement_sql(measure_id):
+    updated_data=request.get_json()
+    val={"mname":updated_data['measure_name'],
+        "unit":updated_data['unit'],
+        "value":updated_data['value'],
+        "pid":updated_data['patient_id'],
+        "mid":measure_id}
+    query=text('UPDATE measurement SET measure_name=:mname,unit=:unit,value=:value,patient_id=:pid WHERE measure_id=:mid')
+    db.session.execute(query,val)
+    db.session.commit()
+    return jsonify({"Msg":"Measurement updated"})
+
+#-----------------------------------------------------------------------------------#
 
 @app.route('/measurements/<int:measure_id>',methods=['DELETE'])
 def delete_measurement(measure_id):
     Measurement.query.filter_by(measure_id=measure_id).delete()
+    db.session.commit()
+    return jsonify({"Msg":"Measurement deleted"})
+
+@app.route('/measurements_sql/<int:measure_id>',methods=['DELETE'])
+def delete_measurement_sql(measure_id):
+    query=text('DELETE FROM measurement WHERE med_id=:id')
+    db.session.execute(query,{"id":measure_id})
     db.session.commit()
     return jsonify({"Msg":"Measurement deleted"})
 
@@ -224,8 +296,27 @@ def fetch_all_data_of_patients():
         for patient,medication,measurement in result
         ]
     return jsonify({"all patient data":data})
-    
 
+@app.route('/fetchall_sql',methods=['GET'])  
+def fetch_all_sql_data_of_patients():
+    query=text('SELECT patient.patient_id,patient.first_name,patient.last_name,medication.med_id,medication.med_name,measurement.measure_name FROM patient INNER JOIN medication ON patient.patient_id=medication.patient_id INNER JOIN measurement ON patient.patient_id=measurement.patient_id')   
+    result=db.session.execute(query)
+    data=[
+        {
+            "patient_id":row.patient_id,
+            "first_name":row.first_name,
+            "last_name":row.last_name,
+            "med_id":row.med_id,
+            "med_name":row.med_name,
+            "measure_name":row.measure_name,
+            
+        } 
+        for row in result
+        ]
+        
+    return jsonify({"all patient data":data})
+    
+#---------------------------------------------------------------------------------------#
 @app.route('/fetchall/<int:id>',methods=['GET'])  
 def fetch_all_data_of_patient_with_id(id):
     result=db.session.query(Patient,Medication,Measurement).select_from(Patient).join(Medication).join(Measurement).filter(Patient.patient_id==id).all()
@@ -249,7 +340,26 @@ def fetch_all_data_of_patient_with_id(id):
         ]
     return jsonify({"all patient data":data})
         
+@app.route('/fetchall_sql/<int:id>',methods=['GET'])  
+def fetch_all_sql_data_of_patients_with_id(id):
+    query=text('SELECT patient.patient_id,patient.first_name,patient.last_name,medication.med_id,medication.med_name,measurement.measure_name FROM patient INNER JOIN medication ON patient.patient_id=medication.patient_id INNER JOIN measurement ON patient.patient_id=measurement.patient_id WHERE patient.patient_id=:id')   
+    result=db.session.execute(query,{"id":id})
+    data=[
+        {
+            "patient_id":row.patient_id,
+            "first_name":row.first_name,
+            "last_name":row.last_name,
+            "med_id":row.med_id,
+            "med_name":row.med_name,
+            "measure_name":row.measure_name,
+            
+        } 
+        for row in result
+        ]
+        
+    return jsonify({"all patient data":data})
 
+    
 if __name__ == '__main__':
     db.create_all()
     app.run(debug = True)
