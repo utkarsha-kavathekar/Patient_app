@@ -7,7 +7,7 @@ from sqlalchemy.sql.sqltypes import Integer
 from werkzeug.utils import redirect
 
 from models import Patient,Medication,Measurement,Allergy
-from sqlalchemy import text 
+from sqlalchemy import text,func,extract 
 from get_db import db,app
 
 @app.route('/')
@@ -18,7 +18,14 @@ def home_page():
 
 @app.route('/patients', methods=['GET'])
 def get_patients():
-    result=[Patient.json(patient) for patient in Patient.query.all()]
+    result=db.session.query(Patient.patient_id,Patient.first_name,Patient.last_name,Patient.date_of_birth,extract('year', func.age(Patient.date_of_birth)).label("Age")).all()
+    result=[{
+        "patient_id":patient.patient_id,
+        "first_name":patient.first_name,
+        "last_name":patient.last_name,
+        "date_of_birth":patient.date_of_birth,
+        "Age":patient.Age
+    } for patient in result]
     return jsonify({"Patients":result})
 
 @app.route('/patients_sql',methods=['GET'])
@@ -192,7 +199,7 @@ def measurements():
 
 @app.route('/measurements_sql',methods=['GET'])
 def measurements_sql():
-    query=text('SELECT * FROM measurements')
+    query=text('SELECT * FROM measurement')
     data=db.session.execute(query)
     result=[Measurement.json(mes) for mes in data]
     return jsonify({"Measurements":result})
@@ -359,7 +366,68 @@ def fetch_all_sql_data_of_patients_with_id(id):
         
     return jsonify({"all patient data":data})
 
-    
+#----------------------------------------------------------------------------------#
+#search patient by first_name
+@app.route('/search/<string:fname>',methods=['GET'])  
+def fetch_all_sql_data_of_patients_with_fname(fname):
+    query=text('SELECT patient.patient_id,patient.first_name,patient.last_name,medication.med_id,medication.med_name,measurement.measure_name FROM patient INNER JOIN medication ON patient.patient_id=medication.patient_id INNER JOIN measurement ON patient.patient_id=measurement.patient_id WHERE patient.first_name=:fname')   
+    result=db.session.execute(query,{"fname":fname})
+    data=[
+        {
+            "patient_id":row.patient_id,
+            "first_name":row.first_name,
+            "last_name":row.last_name,
+            "med_id":row.med_id,
+            "med_name":row.med_name,
+            "measure_name":row.measure_name,
+            
+        } 
+        for row in result
+        ]
+        
+    return jsonify({"all patient data with name %s"%fname:data})
+
+#search patient by med_name
+@app.route('/search_medication/<string:med_name>',methods=['GET'])  
+def fetch_all_sql_data_of_patients_with_med_name(med_name):
+    query=text('SELECT patient.patient_id,patient.first_name,patient.last_name,patient.date_of_birth,medication.med_id,medication.med_name,measurement.measure_name FROM patient INNER JOIN medication ON patient.patient_id=medication.patient_id INNER JOIN measurement ON patient.patient_id=measurement.patient_id WHERE medication.med_name=:mname')   
+    result=db.session.execute(query,{"mname":med_name})
+    data=[
+        {
+            "patient_id":row.patient_id,
+            "first_name":row.first_name,
+            "last_name":row.last_name,
+            "date_of_birth":row.date_of_birth,
+            "med_id":row.med_id,
+            "med_name":row.med_name,
+            "measure_name":row.measure_name,
+            
+        } 
+        for row in result
+        ]
+        
+    return jsonify({"all patient data using medication  %s"%med_name:data}) 
+
+#list all patients with their age in asending order
+@app.route('/list_age',methods=['GET'])  
+def fetch_all_sql_data_of_patients_with_age():
+    result=db.session.query(Patient.patient_id,Patient.first_name,Patient.last_name,Patient.date_of_birth,Medication.med_id,Medication.med_name,Measurement.measure_name,extract('year', func.age(Patient.date_of_birth)).label("Age")).select_from(Patient).join(Medication).join(Measurement).all()
+    data=[
+        {
+            "patient_id":row.patient_id,
+            "first_name":row.first_name,
+            "last_name":row.last_name,
+            "Age":row.Age,
+            "med_id":row.med_id,
+            "med_name":row.med_name,
+            "measure_name":row.measure_name,
+            
+        } 
+        for row in result
+        ]
+        
+    return jsonify({"all patient data in ascending order of age":data}) 
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug = True)
