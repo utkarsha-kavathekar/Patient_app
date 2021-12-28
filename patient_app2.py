@@ -1,14 +1,20 @@
-from flask import Flask, render_template,request,jsonify
+from flask import Flask, render_template,request,jsonify,abort
 from flask.helpers import url_for
 from flask.wrappers import Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.elements import BindParameter
+from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.sqltypes import Integer
 from werkzeug.utils import redirect
+import psycopg2
+from error_handler import NotFoundError,Not_Found_Error
+import logging
 
 from models import Patient,Medication,Measurement,Allergy
 from sqlalchemy import text,func,extract 
 from get_db import db,app
+#-----------------------------------------------------------------------#
+logging.basicConfig(filename='patient.log', level=logging.DEBUG,format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 @app.route('/')
 def home_page():
@@ -16,35 +22,62 @@ def home_page():
 
 ########################### Patients API ####################################
 
+
 @app.route('/patients', methods=['GET'])
+@Not_Found_Error
 def get_patients():
-    result=db.session.query(Patient.patient_id,Patient.first_name,Patient.last_name,Patient.date_of_birth,extract('year', func.age(Patient.date_of_birth)).label("Age")).all()
-    result=[{
-        "patient_id":patient.patient_id,
-        "first_name":patient.first_name,
-        "last_name":patient.last_name,
-        "date_of_birth":patient.date_of_birth,
-        "Age":patient.Age
-    } for patient in result]
-    return jsonify({"Patients":result})
+    try:
+        result=db.session.query(Patient.patient_id,Patient.first_name,Patient.last_name,Patient.date_of_birth,extract('year', func.age(Patient.date_of_birth)).label("Age")).all()
+        
+        app.logger.info("Called GET patient API")
+        if result is None:
+            raise NotFoundError("Unable to find record")
+
+        result=[{
+            "patient_id":patient.patient_id,
+            "first_name":patient.first_name,
+            "last_name":patient.last_name,
+            "date_of_birth":patient.date_of_birth,
+            "Age":patient.Age
+        } for patient in result]
+
+        return jsonify({"Patients":result}),200
+        
+    except psycopg2.OperationalError as e:
+        print(e)
+        return jsonify({"Error":"Operational Error"})
+        
 
 @app.route('/patients_sql',methods=['GET'])
+@Not_Found_Error
 def get_patients_sql():
     query=text('SELECT * FROM patient')
     data=db.session.execute(query)
+    app.logger.info("Called GET patient_sql API")
+    if data is None:
+        raise NotFoundError("Unable to find record")
     result=[Patient.json(patient) for patient in data]
-    return jsonify({"Patients":result})
+    return jsonify({"Patients":result}),200
 #------------------------------------------------------------------------------#
 
 @app.route('/patients/<int:patient_id>',methods=['GET'])
+@Not_Found_Error
 def get_patient_by_id(patient_id):
-    patient=Patient.json(Patient.query.filter_by(patient_id=patient_id).first())
+    patient=Patient.query.filter_by(patient_id=patient_id).first()
+    app.logger.info("Called GET patient by id API")
+    if patient is None:
+        raise NotFoundError("Unable to find record")
+    patient=[Patient.json(patient)]
     return jsonify({"Patients":patient})
 
 @app.route('/patients_sql/<int:patient_id>',methods=['GET'])
+@Not_Found_Error
 def get_patients_sql_by_id(patient_id):
     query=text('SELECT * FROM patient where patient_id = :id')
+    app.logger.info("Called GET patient_sql by id API")
     data=db.session.execute(query,{"id":patient_id})
+    if data is None:
+        raise NotFoundError("Unable to find record")
     result=[Patient.json(patient) for patient in data]
     return jsonify({"Patients":result})
 #------------------------------------------------------------------------------#
@@ -53,26 +86,34 @@ def get_patients_sql_by_id(patient_id):
 def add_patient():
     request_data=request.get_json()
     newPatient = Patient(request_data['first_name'],request_data['last_name'],request_data['date_of_birth'])
+    app.logger.info("Called POST patient API")
     db.session.add(newPatient)
     db.session.commit() 
     response={"Msg":"Patient added"}
-    return response
+    return response,200
 
 @app.route('/patients_sql',methods=['POST'])
 def add_patient_sql():
     request_data=request.get_json()
+    app.logger.info("Called POST patient_sql API")
     query=text('INSERT INTO patient(first_name,last_name,date_of_birth) VALUES(:fname,:lname,:dob)')
     db.session.execute(query,{"fname":request_data['first_name'],"lname":request_data['last_name'],"dob":request_data['date_of_birth']})
     db.session.commit() 
     response={"Msg":"Patient added"}
-    return response
+    return response,200
 
 #-------------------------------------------------------------------------------------#
 
 @app.route('/patients/<int:patient_id>',methods=['PUT'])
+@Not_Found_Error
 def update_patient(patient_id):
     updated_data=request.get_json()
+    app.logger.info("Called PUT patient API")
     patient=Patient.query.filter_by(patient_id=patient_id).first()
+    print(patient)
+    if patient is None:
+        raise NotFoundError("Unable to find record")
+
     patient.first_name = updated_data['first_name']
     patient.last_name = updated_data['last_name']
     patient.date_of_birth = updated_data['date_of_birth']
@@ -81,25 +122,35 @@ def update_patient(patient_id):
     return jsonify({"Msg":"Patient updated"})
 
 @app.route('/patients_sql/<int:patient_id>',methods=['PUT'])
+@Not_Found_Error
 def update_patient_sql(patient_id):
     updated_data=request.get_json()
+    app.logger.info("Called PUT patient_sql API")
     val={"fname":updated_data['first_name'],"lname":updated_data['last_name'],
         "dob":updated_data['date_of_birth'],"id":patient_id}
     query=text('UPDATE patient SET first_name=:fname,last_name=:lname,date_of_birth=:dob WHERE patient_id=:id')
-    db.session.execute(query,val)
+    res=db.session.execute(query,val)
+    print(res)
+    if res is None:
+        raise NotFoundError("Unable to find record")
     db.session.commit()
     return jsonify({"Msg":"Patient updated"})
 
 #-----------------------------------------------------------------------------------#
 @app.route('/patients/<int:patient_id>',methods=['DELETE'])
+@Not_Found_Error
 def delete_patient(patient_id):
-    Patient.query.filter_by(patient_id=patient_id).delete()
+    patient=Patient.query.filter_by(patient_id=patient_id).delete()
+    app.logger.info("Called DELETE patient API")
+    if patient==0:
+        raise NotFoundError("Unable to find record")
     db.session.commit()
     return jsonify({"Msg":"Patient deleted"})
 
 @app.route('/patients_sql/<int:patient_id>',methods=['DELETE'])
 def delete_patient_sql(patient_id):
     query=text('DELETE FROM patient WHERE patient_id=:id')
+    app.logger.info("Called DELETE patient_sql API")
     db.session.execute(query,{"id":patient_id})
     db.session.commit()
     return jsonify({"Msg":"Patient deleted"})
@@ -107,27 +158,37 @@ def delete_patient_sql(patient_id):
 ############################## Medication API ###########################
 
 @app.route('/medications',methods=['GET'])
+@Not_Found_Error
 def medications():
     result=[Medication.json(med) for med in Medication.query.all()]
+    app.logger.info("Called GET medication API")
+    if result is None:
+        raise NotFoundError("Unable to find record")
     return jsonify({"Medications":result})
 
 @app.route('/medications_sql',methods=['GET'])
 def medications_sql():
     query=text('SELECT * FROM medication')
     data=db.session.execute(query)
+    app.logger.info("Called GET medication_sql API")
     result=[Medication.json(med) for med in data]
     return jsonify({"Medications":result})
 #----------------------------------------------------------------------#
 
 @app.route('/medications/<int:med_id>',methods=['GET'])
+@Not_Found_Error
 def get_medication_by_id(med_id):
     medication=Medication.json(Medication.query.filter_by(med_id=med_id).first())
+    app.logger.info("Called GET medication by id API")
+    if medication is None:
+        raise NotFoundError("Unable to find record")
     return jsonify({"Medications":medication})
 
 @app.route('/medications_sql/<int:med_id>',methods=['GET'])
 def get_medication_sql_by_id(med_id):
     query=text('SELECT * FROM medication where med_id = :id')
     data=db.session.execute(query,{"id":med_id})
+    app.logger.info("Called GET medication_sql by id API")
     result=[Medication.json(patient) for patient in data]
     return jsonify({"Medications":result})
 
@@ -135,6 +196,7 @@ def get_medication_sql_by_id(med_id):
 @app.route('/medications',methods=['POST'])
 def add_medication():
     request_data=request.get_json()
+    app.logger.info("Called POST medication API")
     newMed = Medication(request_data['med_name'],request_data['dose'],request_data['frequency'],request_data['intake_type'],request_data['patient_id'])
     db.session.add(newMed)
     db.session.commit() 
@@ -144,6 +206,7 @@ def add_medication():
 @app.route('/medications_sql',methods=['POST'])
 def add_medication_sql():
     request_data=request.get_json()
+    app.logger.info("Called POST medication_sql API")
     query=text('INSERT INTO medication(med_name,dose,frequency,intake_type,patient_id) VALUES(:mname,:dose,:frq,:intake,:pid)')
     val={"mname":request_data['med_name'],
         "dose":request_data['dose'],
@@ -156,9 +219,13 @@ def add_medication_sql():
     return response
 #-----------------------------------------------------------------------#
 @app.route('/medications/<int:med_id>',methods=['PUT'])
+@Not_Found_Error
 def update_medication(med_id):
     updated_data=request.get_json()
+    app.logger.info("Called PUT medication API")
     med=Medication.query.filter_by(med_id=med_id).first()
+    if med is None:
+        raise NotFoundError("Unable to find record")
     med.med_name = updated_data['med_name']
     med.dose = updated_data['dose']
     med.frequency = updated_data['frequency']
@@ -170,6 +237,7 @@ def update_medication(med_id):
 @app.route('/medications_sql/<int:med_id>',methods=['PUT'])
 def update_medication_sql(med_id):
     updated_data=request.get_json()
+    app.logger.info("Called PUT medication_sql API")
     val={"mname":updated_data['med_name'],"dose":updated_data['dose'],
         "frq":updated_data['frequency'],"pid":updated_data['patient_id'],"mid":med_id}
     query=text('UPDATE medication SET med_name=:mname,dose=:dose,frequency=:frq,patient_id=:pid WHERE med_id=:mid')
@@ -178,14 +246,19 @@ def update_medication_sql(med_id):
     return jsonify({"Msg":"Medication updated"})
 #-------------------------------------------------------------------------------------------#
 @app.route('/medications/<int:med_id>',methods=['DELETE'])
+@Not_Found_Error
 def delete_medication(med_id):
-    Medication.query.filter_by(med_id=med_id).delete()
+    result=Medication.query.filter_by(med_id=med_id).delete()
+    app.logger.info("Called DELETE medication API")
+    if result==0:
+        raise NotFoundError("Unable to find record")
     db.session.commit()
     return jsonify({"Msg":"Medication deleted"})
 
 @app.route('/medications_sql/<int:med_id>',methods=['DELETE'])
 def delete_medication_sql(med_id):
     query=text('DELETE FROM medication WHERE med_id=:id')
+    app.logger.info("Called DELETE medication_sql API")
     db.session.execute(query,{"id":med_id})
     db.session.commit()
     return jsonify({"Msg":"Medication deleted"})
@@ -193,28 +266,38 @@ def delete_medication_sql(med_id):
 
 
 @app.route('/measurements',methods=['GET'])
+@Not_Found_Error
 def measurements():
     result=[Measurement.json(mes) for mes in Measurement.query.all()]
+    app.logger.info("Called GET measurement API")
+    if result is None:
+        raise NotFoundError("Unable to find record")
     return jsonify({"Measurements":result})
 
 @app.route('/measurements_sql',methods=['GET'])
 def measurements_sql():
     query=text('SELECT * FROM measurement')
     data=db.session.execute(query)
+    app.logger.info("Called GET measurement_sql API")
     result=[Measurement.json(mes) for mes in data]
     return jsonify({"Measurements":result})
 
 #------------------------------------------------------------------------------------#
 
 @app.route('/measurements/<int:measure_id>',methods=['GET'])
+@Not_Found_Error
 def get_measurement_by_id(measure_id):
     measurement=Measurement.json(Measurement.query.filter_by(measure_id=measure_id).first())
+    app.logger.info("Called GET measurement by id API")
+    if measurement is None:
+        raise NotFoundError("Unable to find record")
     return jsonify({"Measurements":measurement})
 
 @app.route('/measurements_sql/<int:measure_id>',methods=['GET'])
 def get_measurement_sql_by_id(measure_id):
     query=text('SELECT * FROM measurement where measure_id = :id')
     data=db.session.execute(query,{"id":measure_id})
+    app.logger.info("Called GET measurement_sql by id API")
     result=[Measurement.json(patient) for patient in data]
     return jsonify({"Measurements":result})
 
@@ -222,6 +305,7 @@ def get_measurement_sql_by_id(measure_id):
 @app.route('/measurements',methods=['POST'])
 def add_measurement():
     request_data=request.get_json()
+    app.logger.info("Called POST measurement API")
     newMes = Measurement(request_data['measure_name'],request_data['unit'],request_data['value'],request_data['patient_id'])
     db.session.add(newMes)
     db.session.commit() 
@@ -231,6 +315,7 @@ def add_measurement():
 @app.route('/measurements_sql',methods=['POST'])
 def add_measurement_sql():
     request_data=request.get_json()
+    app.logger.info("Called POST measurement_sql API")
     query=text('INSERT INTO measurement(measure_name,unit,value,patient_id) VALUES(:mname,:unit,:value,:pid)')
     db.session.execute(query,{"mname":request_data['measure_name'],"unit":request_data['unit'],"value":request_data['value'],"pid":request_data['patient_id']})
     db.session.commit() 
@@ -239,9 +324,13 @@ def add_measurement_sql():
 
 #-----------------------------------------------------------------------------#
 @app.route('/measurements/<int:measure_id>',methods=['PUT'])
+@Not_Found_Error
 def update_measurement(measure_id):
     updated_data=request.get_json()
+    app.logger.info("Called PUT measurement API")
     mes=Measurement.query.filter_by(measure_id=measure_id).first()
+    if mes is None:
+        raise NotFoundError("Unable to find record")
     mes.measure_name = updated_data['measure_name']
     mes.unit = updated_data['unit']
     mes.value = updated_data['value']
@@ -252,6 +341,7 @@ def update_measurement(measure_id):
 @app.route('/measurements_sql/<int:measure_id>',methods=['PUT'])
 def update_measurement_sql(measure_id):
     updated_data=request.get_json()
+    app.logger.info("Called PUT measurement_sql API")
     val={"mname":updated_data['measure_name'],
         "unit":updated_data['unit'],
         "value":updated_data['value'],
@@ -265,8 +355,12 @@ def update_measurement_sql(measure_id):
 #-----------------------------------------------------------------------------------#
 
 @app.route('/measurements/<int:measure_id>',methods=['DELETE'])
+@Not_Found_Error
 def delete_measurement(measure_id):
-    Measurement.query.filter_by(measure_id=measure_id).delete()
+    result=Measurement.query.filter_by(measure_id=measure_id).delete()
+    app.logger.info("Called DELETE measurement API")
+    if result==0:
+        raise NotFoundError("Unable to find record")
     db.session.commit()
     return jsonify({"Msg":"Measurement deleted"})
 
@@ -274,6 +368,7 @@ def delete_measurement(measure_id):
 def delete_measurement_sql(measure_id):
     query=text('DELETE FROM measurement WHERE med_id=:id')
     db.session.execute(query,{"id":measure_id})
+    app.logger.info("Called DELETE measurement_sql API")
     db.session.commit()
     return jsonify({"Msg":"Measurement deleted"})
 
@@ -324,9 +419,12 @@ def fetch_all_sql_data_of_patients():
     return jsonify({"all patient data":data})
     
 #---------------------------------------------------------------------------------------#
-@app.route('/fetchall/<int:id>',methods=['GET'])  
+@app.route('/fetchall/<int:id>',methods=['GET']) 
+@Not_Found_Error
 def fetch_all_data_of_patient_with_id(id):
     result=db.session.query(Patient,Medication,Measurement).select_from(Patient).join(Medication).join(Measurement).filter(Patient.patient_id==id).all()
+    if result is None:
+        raise NotFoundError("Unable to find record")
     data=[
         {
             "patient_id":patient.patient_id,
@@ -427,6 +525,8 @@ def fetch_all_sql_data_of_patients_with_age():
         ]
         
     return jsonify({"all patient data in ascending order of age":data}) 
+
+
 
 if __name__ == '__main__':
     db.create_all()
