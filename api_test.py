@@ -48,7 +48,7 @@ class PatientApiTest(unittest.TestCase):
         }
         req = requests.post("http://127.0.0.1:5000/patients",json=_data)
         data=req.json()
-        self.assertEqual(req.status_code,200)
+        self.assertEqual(req.status_code,201)
         assert req.headers["Content-Type"] == "application/json"
         self.assertEqual(data['Msg'],"Patient added")
 
@@ -64,6 +64,20 @@ class PatientApiTest(unittest.TestCase):
         assert req.headers["Content-Type"] == "application/json"
         self.assertEqual(data['Msg'],"Patient updated")
 
+    @unittest.skip
+    def test_delete_patient(self):
+        req = requests.delete("http://127.0.0.1:5000/patients/13")
+        data=req.json()
+        self.assertEqual(req.status_code,200)
+        assert req.headers["Content-Type"] == "application/json"
+        self.assertEqual(data['Msg'],"Patient deleted")
+
+    def test_delete_patient_not_exist(self):
+        req = requests.delete("http://127.0.0.1:5000/patients/3")
+        data=req.json()
+        self.assertEqual(req.status_code,404)
+        assert req.headers["Content-Type"] == "application/json"
+        self.assertEqual(data["Error"],"Requested data not found")
 
 if __name__=="__main__":
     unittest.main()

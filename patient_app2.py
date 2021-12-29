@@ -68,7 +68,7 @@ def get_patient_by_id(patient_id):
     if patient is None:
         raise NotFoundError("Unable to find record")
     patient=[Patient.json(patient)]
-    return jsonify({"Patients":patient})
+    return jsonify({"Patients":patient}),200
 
 @app.route('/patients_sql/<int:patient_id>',methods=['GET'])
 @Not_Found_Error
@@ -79,7 +79,7 @@ def get_patients_sql_by_id(patient_id):
     if data is None:
         raise NotFoundError("Unable to find record")
     result=[Patient.json(patient) for patient in data]
-    return jsonify({"Patients":result})
+    return jsonify({"Patients":result}),200
 #------------------------------------------------------------------------------#
 
 @app.route('/patients',methods=['POST'])
@@ -90,7 +90,7 @@ def add_patient():
     db.session.add(newPatient)
     db.session.commit() 
     response={"Msg":"Patient added"}
-    return response,200
+    return response,201
 
 @app.route('/patients_sql',methods=['POST'])
 def add_patient_sql():
@@ -100,7 +100,7 @@ def add_patient_sql():
     db.session.execute(query,{"fname":request_data['first_name'],"lname":request_data['last_name'],"dob":request_data['date_of_birth']})
     db.session.commit() 
     response={"Msg":"Patient added"}
-    return response,200
+    return response,201
 
 #-------------------------------------------------------------------------------------#
 
