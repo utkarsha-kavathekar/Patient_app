@@ -1,7 +1,9 @@
 from functools import wraps
 from flask.json import jsonify
 from get_db import app
-from flask import jsonify,abort
+from flask import jsonify,abort,request
+import jwt
+import datetime
 
 @app.errorhandler(404)
 def handle_404_error(error):
@@ -33,3 +35,29 @@ def Not_Found_Error(func):
         return fun
     return Inner_Function
 
+def auth_required(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if auth and auth.username=='admin' and auth.password=='admin':
+            return func(*args, **kwargs)
+
+        return jsonify({"login error":"Could not verify user"}),401
+    return decorated
+
+def token_auth_required(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            jsonify({'msg':'token is missing'}),403
+        try:
+            data = jwt.decode(token,key=app.config['SECRET_KEY'],algorithms='HS256')
+        except:
+            return jsonify({'msg':'Token is invalid'}),403
+
+        return func(*args, **kwargs)
+        
+    return decorated

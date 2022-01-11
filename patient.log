@@ -210,3 +210,119 @@
 2021-12-29 16:26:25,453 WARNING werkzeug MainThread :  * Debugger is active!
 2021-12-29 16:26:25,469 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
 2021-12-29 16:26:25,629 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-06 17:54:32,752 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-06 17:54:35,887 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-06 17:54:35,905 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-06 17:54:36,103 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-06 17:55:33,854 INFO get_db Thread-2 : Called GET patient API
+2022-01-06 17:55:33,863 INFO werkzeug Thread-2 : 127.0.0.1 - - [06/Jan/2022 17:55:33] "GET /patients HTTP/1.1" 200 -
+2022-01-06 17:56:07,312 INFO get_db Thread-3 : Called PUT patient_sql API
+2022-01-06 17:56:07,412 INFO werkzeug Thread-3 : 127.0.0.1 - - [06/Jan/2022 17:56:07] "PUT /patients_sql/5 HTTP/1.1" 200 -
+2022-01-06 17:56:56,514 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\error_handler.py', reloading
+2022-01-06 17:56:58,948 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-06 17:57:01,673 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-06 17:57:01,683 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-06 17:57:01,850 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-06 18:00:30,828 INFO get_db Thread-2 : Called PUT patient_sql API
+2022-01-06 18:00:30,843 INFO werkzeug Thread-2 : 127.0.0.1 - - [06/Jan/2022 18:00:30] "PUT /patients_sql/5 HTTP/1.1" 200 -
+2022-01-06 18:00:48,257 INFO get_db Thread-3 : Called GET patient_sql by id API
+2022-01-06 18:00:48,261 INFO werkzeug Thread-3 : 127.0.0.1 - - [06/Jan/2022 18:00:48] "GET /patients_sql/5 HTTP/1.1" 200 -
+2022-01-06 18:01:25,728 INFO get_db Thread-4 : Called GET patient by id API
+2022-01-06 18:01:25,732 INFO werkzeug Thread-4 : 127.0.0.1 - - [06/Jan/2022 18:01:25] "GET /patients/5 HTTP/1.1" 200 -
+2022-01-06 18:01:40,018 INFO werkzeug Thread-5 : 127.0.0.1 - - [06/Jan/2022 18:01:40] "[31m[1mPUT /patients/5 HTTP/1.1[0m" 401 -
+2022-01-06 18:02:16,617 INFO get_db Thread-6 : Called GET patient by id API
+2022-01-06 18:02:16,621 INFO werkzeug Thread-6 : 127.0.0.1 - - [06/Jan/2022 18:02:16] "GET /patients/5 HTTP/1.1" 200 -
+2022-01-06 18:02:24,714 INFO get_db Thread-7 : Called PUT patient API
+2022-01-06 18:02:24,736 INFO werkzeug Thread-7 : 127.0.0.1 - - [06/Jan/2022 18:02:24] "PUT /patients/5 HTTP/1.1" 200 -
+2022-01-06 18:02:33,413 INFO get_db Thread-8 : Called GET patient by id API
+2022-01-06 18:02:33,415 INFO werkzeug Thread-8 : 127.0.0.1 - - [06/Jan/2022 18:02:33] "GET /patients/5 HTTP/1.1" 200 -
+2022-01-11 17:47:19,009 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 17:47:23,158 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 17:47:23,173 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 17:47:23,289 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 17:47:31,955 INFO get_db Thread-2 : Called GET patient API
+2022-01-11 17:47:31,957 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 17:47:31] "GET /patients HTTP/1.1" 200 -
+2022-01-11 17:48:00,956 INFO werkzeug Thread-3 : 127.0.0.1 - - [11/Jan/2022 17:48:00] "[31m[1mGET /login HTTP/1.1[0m" 401 -
+2022-01-11 17:48:35,826 INFO werkzeug Thread-4 : 127.0.0.1 - - [11/Jan/2022 17:48:35] "[35m[1mGET /login HTTP/1.1[0m" 500 -
+2022-01-11 17:54:17,927 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\patient_app2.py', reloading
+2022-01-11 17:54:18,541 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 17:54:20,970 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 17:54:20,981 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 17:54:21,136 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 17:54:46,193 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 17:54:49,256 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 17:54:49,267 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 17:54:49,490 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 17:54:51,206 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 17:54:51] "GET /login HTTP/1.1" 200 -
+2022-01-11 17:55:22,571 INFO werkzeug Thread-3 : 127.0.0.1 - - [11/Jan/2022 17:55:22] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 17:56:14,922 INFO werkzeug Thread-4 : 127.0.0.1 - - [11/Jan/2022 17:56:14] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 17:58:42,784 INFO werkzeug Thread-5 : 127.0.0.1 - - [11/Jan/2022 17:58:42] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 17:58:54,094 INFO werkzeug Thread-6 : 127.0.0.1 - - [11/Jan/2022 17:58:54] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 18:04:39,343 INFO werkzeug Thread-7 : 127.0.0.1 - - [11/Jan/2022 18:04:39] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 18:05:19,967 INFO werkzeug Thread-8 : 127.0.0.1 - - [11/Jan/2022 18:05:19] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 18:05:56,808 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\get_db.py', reloading
+2022-01-11 18:05:57,375 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:05:59,801 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:05:59,811 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:05:59,961 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:17:28,284 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\error_handler.py', reloading
+2022-01-11 18:17:28,852 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:17:34,145 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:17:34,160 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:17:48,269 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:17:51,103 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:17:51,117 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:17:51,304 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:18:17,352 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 18:18:17] "GET /login HTTP/1.1" 200 -
+2022-01-11 18:18:48,057 INFO werkzeug Thread-3 : 127.0.0.1 - - [11/Jan/2022 18:18:48] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 18:19:39,821 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\error_handler.py', reloading
+2022-01-11 18:19:40,349 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:19:42,639 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:19:42,647 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:19:42,788 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:19:56,847 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:19:59,946 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:19:59,961 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:20:00,193 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:20:00,912 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 18:20:00] "GET /login HTTP/1.1" 200 -
+2022-01-11 18:20:28,165 INFO werkzeug Thread-3 : 127.0.0.1 - - [11/Jan/2022 18:20:28] "[35m[1mDELETE /patients/4 HTTP/1.1[0m" 500 -
+2022-01-11 18:22:47,380 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:22:50,600 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:22:50,615 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:22:50,859 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:22:51,189 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 18:22:51] "GET /login HTTP/1.1" 200 -
+2022-01-11 18:23:16,184 INFO werkzeug Thread-3 : 127.0.0.1 - - [11/Jan/2022 18:23:16] "[31m[1mDELETE /patients/4 HTTP/1.1[0m" 403 -
+2022-01-11 18:25:08,371 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\error_handler.py', reloading
+2022-01-11 18:25:08,953 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:25:11,190 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:25:11,198 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:25:11,339 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:25:30,326 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:25:32,947 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:25:32,961 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:25:33,107 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:25:39,553 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 18:25:39] "GET /login HTTP/1.1" 200 -
+2022-01-11 18:25:54,250 INFO werkzeug Thread-3 : 127.0.0.1 - - [11/Jan/2022 18:25:54] "[35m[1mDELETE /patients/4 HTTP/1.1[0m" 500 -
+2022-01-11 18:26:26,885 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\error_handler.py', reloading
+2022-01-11 18:26:27,473 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:26:29,767 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:26:29,779 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:26:29,937 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:26:45,468 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:26:48,308 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:26:48,328 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:26:48,573 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:26:51,820 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 18:26:51] "GET /login HTTP/1.1" 200 -
+2022-01-11 18:27:09,053 INFO get_db Thread-3 : Called DELETE patient API
+2022-01-11 18:27:09,059 INFO werkzeug Thread-3 : 127.0.0.1 - - [11/Jan/2022 18:27:09] "DELETE /patients/4 HTTP/1.1" 200 -
+2022-01-11 18:27:36,829 INFO werkzeug MainThread :  * Detected change in 'd:\\Flask_applications\\Patient_app\\error_handler.py', reloading
+2022-01-11 18:27:37,407 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:27:39,714 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:27:39,725 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:27:39,876 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:43:20,904 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-11 18:43:23,734 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-11 18:43:23,748 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-11 18:43:23,877 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-11 18:43:43,595 INFO get_db Thread-2 : Called GET patient API
+2022-01-11 18:43:43,597 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 18:43:43] "GET /patients HTTP/1.1" 200 -

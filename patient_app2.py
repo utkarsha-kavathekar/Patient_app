@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,jsonify,abort
+from flask import Flask,request,jsonify,abort
 from flask.helpers import url_for
 from flask.wrappers import Response
 from flask_sqlalchemy import SQLAlchemy
@@ -7,8 +7,10 @@ from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.sqltypes import Integer
 from werkzeug.utils import redirect
 import psycopg2
-from error_handler import NotFoundError,Not_Found_Error
+from error_handler import NotFoundError,Not_Found_Error, auth_required, token_auth_required
 import logging
+import jwt
+import datetime
 
 from models import Patient,Medication,Measurement,Allergy
 from sqlalchemy import text,func,extract 
@@ -21,7 +23,15 @@ def home_page():
     return jsonify(hello='world')
 
 ########################### Patients API ####################################
+@app.route('/login')
+def login():
+    auth = request.authorization
+    if auth and auth.username=='admin' and auth.password=='admin':
+        token = jwt.encode({'user':auth.username,'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=10)},app.config['SECRET_KEY'])
+        
+        return jsonify({'token': token})
 
+    return jsonify({"login error":"Could not verify user"}),401
 
 @app.route('/patients', methods=['GET'])
 @Not_Found_Error
@@ -105,6 +115,7 @@ def add_patient_sql():
 #-------------------------------------------------------------------------------------#
 
 @app.route('/patients/<int:patient_id>',methods=['PUT'])
+@auth_required
 @Not_Found_Error
 def update_patient(patient_id):
     updated_data=request.get_json()
@@ -138,6 +149,7 @@ def update_patient_sql(patient_id):
 
 #-----------------------------------------------------------------------------------#
 @app.route('/patients/<int:patient_id>',methods=['DELETE'])
+@token_auth_required
 @Not_Found_Error
 def delete_patient(patient_id):
     patient=Patient.query.filter_by(patient_id=patient_id).delete()
