@@ -326,3 +326,9 @@
 2022-01-11 18:43:23,877 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 2022-01-11 18:43:43,595 INFO get_db Thread-2 : Called GET patient API
 2022-01-11 18:43:43,597 INFO werkzeug Thread-2 : 127.0.0.1 - - [11/Jan/2022 18:43:43] "GET /patients HTTP/1.1" 200 -
+2022-01-12 12:04:43,420 INFO werkzeug MainThread :  * Restarting with stat
+2022-01-12 12:04:47,025 WARNING werkzeug MainThread :  * Debugger is active!
+2022-01-12 12:04:47,057 INFO werkzeug MainThread :  * Debugger PIN: 792-681-052
+2022-01-12 12:04:47,537 INFO werkzeug Thread-1 :  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2022-01-12 12:08:57,524 INFO get_db Thread-2 : Called GET patient API
+2022-01-12 12:08:57,525 INFO werkzeug Thread-2 : 127.0.0.1 - - [12/Jan/2022 12:08:57] "GET /patients HTTP/1.1" 200 -
