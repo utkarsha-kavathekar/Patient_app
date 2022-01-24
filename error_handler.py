@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from functools import wraps
 from flask.json import jsonify
 from get_db import app

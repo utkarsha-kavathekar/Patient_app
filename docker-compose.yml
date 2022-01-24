@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    command: python patient_app2.py
+    ports:
+      - "5000:5432"
+    volumes:
+      - .:/
+  db:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=patient_db
+volumes:
+  postgres_data:

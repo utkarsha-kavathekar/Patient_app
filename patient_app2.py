@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from flask import Flask,request,jsonify,abort
 from flask.helpers import url_for
 from flask.wrappers import Response
@@ -20,7 +21,7 @@ logging.basicConfig(filename='patient.log', level=logging.DEBUG,format=f'%(ascti
 
 @app.route('/')
 def home_page():
-    return jsonify(hello='world')
+    return jsonify({'hello':'world'})
 
 ########################### Patients API ####################################
 @app.route('/login')
