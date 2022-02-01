@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from flask import Flask,request,jsonify,abort
 from flask.helpers import url_for
 from flask.wrappers import Response
@@ -16,8 +15,20 @@ import datetime
 from models import Patient,Medication,Measurement,Allergy
 from sqlalchemy import text,func,extract 
 from get_db import db,app
-#-----------------------------------------------------------------------#
-logging.basicConfig(filename='patient.log', level=logging.DEBUG,format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+from flask_swagger_ui import get_swaggerui_blueprint
+# flask swagger configs
+
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.yml'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Patient app API"
+    }
+)
+
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
 
 @app.route('/')
 def home_page():

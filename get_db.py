@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 #from sqlalchemy import create_engine,MetaData,Table,Column,Integer,String

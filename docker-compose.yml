@@ -2,11 +2,11 @@ version: "3.8"
 services:
   app:
     build: .
-    command: python patient_app2.py
+    command: python ./patient_app2.py
     ports:
       - "5000:5432"
     volumes:
-      - .:/
+      - .:/Flask_applications/Patient_app/
   db:
     image: postgres:latest
     volumes:

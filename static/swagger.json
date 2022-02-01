@@ -1,0 +1,10 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "Patient API",
+      "version": "1.0.0",
+      "title": "Flask application maintaining patient details"
+      
+    }
+    
+}

@@ -1,0 +1,627 @@
+openapi: "3.0.0"
+info:
+  description: "This is flask rest application built to manage patients details"
+  version: "1.0.0"
+  title: "Patient API"
+  
+tags:
+- name: "login"
+  description: "Login to get token"
+- name: "patients"
+  description: "Manage the patients records"
+- name: "medications"
+  description: "Access the medications details"
+- name: "measurements"
+  description: "Access the measurements details"
+  
+schemes:
+- "http"
+paths:
+  /login:
+    get:
+      tags:
+      - "login"
+      summary: "Get token for authentication"
+      description: ""
+      operationId: "login"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "header"
+        description: "User name for login"
+        required: true
+      - name: "password" 
+        in: "header" 
+        description: "Password for login"
+        required: true        
+      responses:
+        "200":
+          description: "login successful"
+          schema:
+            type: "object"
+            properties:
+              token: 
+                type: "string"
+              
+        "401":
+          description: "Login error"
+          schema:
+            type: "object"
+            properties:
+              login error:
+                "Could not verify user"
+      
+  /patients:
+    post:
+      tags:
+      - "patients"
+      summary: "Add a new patients details"
+      description: ""
+      operationId: "add_patient"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Patient object that needs to be added"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            first_name:
+              type: "string"
+            last_name:
+              type: "string"
+            date_of_birth:
+              type: "string"
+              format: "date-time"
+          xml:
+            name: "Patient"
+          #$ref: "#/definitions/Patient"
+      responses:
+        "405":
+          description: "Invalid input"
+    
+    get:
+      tags:
+      - "patients"
+      summary: "Get list of all patients"
+      description: "Returns a list of patient"
+      operationId: "get_patients"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              patient_id: 
+                type: "integer"
+              first_name: 
+                type: "string"
+              last_name:
+                type: "string"
+              date_of_birth:
+                type: "string"
+                format: "date-time"
+              Age: 
+                type: "integer"
+
+            #$ref: "#/definitions/Patient"
+        "404":
+          description: "Patient not found"
+
+  /patients/{patient_id}:
+    get:
+      tags:
+      - "patients"
+      summary: "Find patient details by ID"
+      description: "Returns a single patient details"
+      operationId: "get_patient_by_id"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "patient_id"
+        in: "path"
+        description: "ID of patient to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Patient"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Patient not found"
+          schema:
+            type: "object"
+            properties:
+              Error: "Requested data not found"
+      
+    put:
+      tags:
+      - "patients"
+      summary: "Updates a patients data"
+      description: "Updates a patients data"
+      operationId: "update_patient"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "patient_id"
+        in: "path"
+        description: "ID of patient that needs to be updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "Data to be updated"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            first_name:
+              type: "string"
+            last_name:
+              type: "string"
+            date_of_birth:
+              type: "string"
+              format: "date-time"
+          xml:
+            name: "Patient"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Patient Updated"
+          schema:
+            type: "object"
+            properties:
+              Msg: "Patient updated"
+        "404":
+          description: "Patient not found"
+          schema:
+            type: "object"
+            properties:
+              Error: "Requested data not found"
+      security:
+      - basicAuth: []
+      
+    delete:
+      tags:
+      - "patients"
+      summary: "Deletes a patient with given id"
+      description: "Deletes a patient with given id"
+      operationId: "delete_patient"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "patient_id"
+        in: "path"
+        description: "Patient id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Patient Deleted"
+          schema:
+            type: "object"
+            properties:
+              Msg: "Patient Deleted"
+        "404":
+          description: "Patient not found"
+      security:
+      - bearerAuth: []
+        
+
+  /medications:
+    post:
+      tags:
+      - "medications"
+      summary: "Add a new medications details"
+      description: ""
+      operationId: "add_medication"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "medication object that needs to be added"
+        required: true
+        schema:
+          type: "object"
+          properties:
+              med_name:
+                type: "string"
+              dose:
+                type: "string"
+              frequency:
+                type: "integer"
+                format: "int64"
+              intake_type:
+                type: "string"
+              patient_id:
+                type: "integer"
+                format: "int64"
+          xml:
+            name: "Medications"
+          
+      responses:
+        "405":
+          description: "Invalid input"
+    
+    get:
+      tags:
+      - "medications"
+      summary: "Get list of all medications"
+      description: "Returns a list of medications"
+      operationId: "medications"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            schema:
+            $ref: "#/definitions/Medication"
+            
+        "404":
+          description: "Medication not found"
+
+  /medications/{med_id}:
+    get:
+      tags:
+      - "medications"
+      summary: "Find medication details by ID"
+      description: "Returns a single medications details"
+      operationId: "get_medication_by_id"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "med_id"
+        in: "path"
+        description: "ID of medication to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Medication"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Medication not found"
+          schema:
+            type: "object"
+            properties:
+              Error: "Requested data not found"
+      
+    put:
+      tags:
+      - "medications"
+      summary: "Updates a medications data"
+      description: "Updates a medications data"
+      operationId: "update_medication"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "med_id"
+        in: "path"
+        description: "ID of medication that needs to be updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "Data to be updated"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            med_name:
+                type: "string"
+            dose:
+              type: "string"
+            frequency:
+              type: "integer"
+              format: "int64"
+            intake_type:
+              type: "string"
+            patient_id:
+              type: "integer"
+              format: "int64"
+          xml:
+            name: "Patient"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Medication Updated"
+          schema:
+            type: "object"
+            properties:
+              Msg: "Medication updated"
+        "404":
+          description: "Medication not found"
+          schema:
+            type: "object"
+            properties:
+              Error: "Requested data not found"
+      security:
+      - basicAuth: []
+      
+    delete:
+      tags:
+      - "medications"
+      summary: "Deletes a medication with given id"
+      description: "Deletes a medication with given id"
+      operationId: "delete_medication"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "med_id"
+        in: "path"
+        description: "Medication id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Medication Deleted"
+          schema:
+            type: "object"
+            properties:
+              Msg: "Medication Deleted"
+        "404":
+          description: "Medication not found"
+      security:
+      - bearerAuth: []
+
+  /measurements:
+    post:
+      tags:
+      - "measurements"
+      summary: "Add a new measurements details"
+      description: ""
+      operationId: "measurements"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "measurements object that needs to be added"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            measure_name:
+              type: "string"
+            unit:
+              type: "string"
+            value:
+              type: "string"
+            patient_id:
+              type: "integer"
+              format: "int64"
+          xml:
+            name: "Measurements"
+          
+      responses:
+        "405":
+          description: "Invalid input"
+    
+    get:
+      tags:
+      - "measurements"
+      summary: "Get list of all measurements"
+      description: "Returns a list of measurements"
+      operationId: "measurements"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Measurement"
+            
+        "404":
+          description: "Measurement not found"
+
+  /measurements/{measure_id}:
+    get:
+      tags:
+      - "measurements"
+      summary: "Find measurements details by ID"
+      description: "Returns a single measurement details"
+      operationId: "get_measurement_by_id"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "measure_id"
+        in: "path"
+        description: "ID of measurement to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Measurement"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Measurement not found"
+          schema:
+            type: "object"
+            properties:
+              Error: "Requested data not found"
+      
+    put:
+      tags:
+      - "measurements"
+      summary: "Updates a measurements data"
+      description: "Updates a measurements data"
+      operationId: "update_measurement"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "measure_id"
+        in: "path"
+        description: "ID of measurement that needs to be updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "Data to be updated"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            measure_id:
+              type: "integer"
+              format: "int64"
+            measure_name:
+              type: "string"
+            unit:
+              type: "string"
+            value:
+              type: "string"
+            patient_id:
+              type: "integer"
+              format: "int64"
+          xml:
+            name: "Measurement"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "Measurement Updated"
+          schema:
+            type: "object"
+            properties:
+              Msg: "Measurement updated"
+        "404":
+          description: "Measurement not found"
+          schema:
+            type: "object"
+            properties:
+              Error: "Requested data not found"
+      security:
+      - basicAuth: []
+      
+    delete:
+      tags:
+      - "measurements"
+      summary: "Deletes a measurement with given id"
+      description: "Deletes a measurement with given id"
+      operationId: "delete_measurement"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "measure_id"
+        in: "path"
+        description: "Measurement id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Measurement Deleted"
+          schema:
+            type: "object"
+            properties:
+              Msg: "Measurement Deleted"
+        "404":
+          description: "Measurement not found"
+      security:
+      - bearerAuth: []
+
+components:
+  securitySchemes:
+    basicAuth:     
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  
+
+definitions:
+  Patient:
+    type: "object"
+    properties:
+      patient_id:
+        type: "integer"
+        format: "int64"
+      first_name:
+        type: "string"
+      last_name:
+        type: "string"
+      date_of_birth:
+        type: "string"
+        format: "date-time"
+    xml:
+      name: "Patient"
+  Medication:
+    type: "object"
+    properties:
+      med_id:
+        type: "integer"
+        format: "int64"
+      med_name:
+        type: "string"
+      dose:
+        type: "string"
+      frequency:
+        type: "integer"
+        format: "int64"
+      intake_type:
+        type: "string"
+      patient_id:
+        type: "integer"
+        format: "int64"
+    xml:
+      name: "Medication"
+  Measurement:
+    type: "object"
+    properties:
+      measure_id:
+        type: "integer"
+        format: "int64"
+      measure_name:
+        type: "string"
+      unit:
+        type: "string"
+      value:
+        type: "string"
+      patient_id:
+        type: "integer"
+        format: "int64"
+      
+    xml:
+      name: "Measurement"
